@@ -31,7 +31,7 @@ jobs:
       - uses: "actions/checkout@v4"
         with:
           token: ${{ secrets.REPO_TOKEN }}
-          repository: ${{ env.DOCS_REPO }}
+          repository: $DOCS_REPO
       - uses: "authzed/actions/setup-go@main"
       - uses: "authzed/actions/setup-mage@main"
 
