@@ -15,6 +15,8 @@ env:
 permissions:
   contents: "write"
   pull-requests: "write"
+  actions: "write"
+  repository-projects: "write"
 
 jobs:
   sync-docs:
@@ -30,48 +32,42 @@ jobs:
 
       - name: "Clone docs repository"
         run: |
-          git clone --depth 1 --branch $DOCS_BRANCH https://github.com/$DOCS_REPO.git docs-repo || {
+          git clone --depth 1 --branch $DOCS_BRANCH https://${{ secrets.GITHUB_TOKEN }}@github.com/$DOCS_REPO.git docs-repo || {
             echo "Failed to clone docs repository"
             exit 1
           }
-
-      - name: "Sync documentation changes"
-        id: "sync"
-        run: |
-          rsync -r --delete $GENERATED_DOCS_FILE/ docs-repo/$TARGET_DOCS_FILE
-          cd docs-repo
-          if ! git diff --exit-code; then
-            echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
-          else
-            echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
-          fi
-
       - name: "Configure Git"
-        if: |
-          env.CHANGES_DETECTED == 'true'
         run: |
           cd docs-repo
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: "Commit and push changes"
-        if: |
-          env.CHANGES_DETECTED == 'true'
+      - name: "Sync documentation changes"
+        id: "sync"
         run: |
+          mkdir -p $(dirname $GENERATED_DOCS_FILE)
+          mkdir -p docs-repo/$(dirname $TARGET_DOCS_FILE)
+          touch docs-repo/$TARGET_DOCS_FILE
+          rsync -avz $GENERATED_DOCS_FILE docs-repo/$TARGET_DOCS_FILE
           cd docs-repo
           git add $TARGET_DOCS_FILE
-          git commit -m "Update generated docs"
-          git push origin $DOCS_BRANCH
+          if ! git diff --cached --exit-code; then
+            echo "Changes detected in $TARGET_DOCS_FILE."
+            echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
+            git checkout -b 'update-generated-docs'
+            git commit -m "Update generated docs"
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$DOCS_REPO
+            git push origin update-generated-docs
 
-      - name: "Create pull request"
-        if: |
-          env.CHANGES_DETECTED == 'true'
-        uses: "peter-evans/create-pull-request@v5"
-        with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
-          commit-message: "Update generated docs"
-          branch: "update-generated-docs"
-          title: "Sync generated docs"
-          body: |
-            Update zed documentation in directory `$TARGET_DOCS_FILE` with the latest version from the zed repository
-          base: "$DOCS_BRANCH"
+            # Store the token in a file that can be accessed by the CLI
+            echo "${{ secrets.GITHUB_TOKEN }}" > token.txt
+            gh auth login --with-token < token.txt
+            gh pr create \
+              --body "" \
+              --title "docs: update zed docs" \
+              --head "update-generated-docs" \
+              --base "main"
+          else
+            echo "No changes detected in $TARGET_DOCS_FILE."
+            echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
+          fi
