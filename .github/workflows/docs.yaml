@@ -36,7 +36,7 @@ jobs:
 
       - name: "Clone docs repository"
         run: |
-          git clone --depth 1 --branch $DOCS_BRANCH https://${{ secrets.ACCESS_TOKEN }}@github.com/$DOCS_REPO.git docs-repo || {
+          git clone --depth 1 --branch $DOCS_BRANCH https://${{ secrets.REPO_TOKEN }}@github.com/$DOCS_REPO.git docs-repo || {
             echo "Failed to clone docs repository"
             exit 1
           }
@@ -60,9 +60,9 @@ jobs:
             echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
             git checkout -b 'update-generated-docs'
             git commit -m "Update generated docs"
-            git remote set-url origin https://x-access-token:${{ secrets.ACCESS_TOKEN }}@github.com/$DOCS_REPO
+            git remote set-url origin https://x-access-token:${{ secrets.REPO_TOKEN }}@github.com/$DOCS_REPO
             git push origin $DOCS_BRANCH
-            echo "${{ secrets.PAT }}" > token.txt
+            echo "${{ secrets.REPO_TOKEN }}" > token.txt
             gh auth login --with-token < token.txt
             gh pr create \
               --body "" \
