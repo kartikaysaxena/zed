@@ -62,7 +62,7 @@ jobs:
             git commit -m "Update generated docs"
             git remote set-url origin https://x-access-token:${{ secrets.REPO_TOKEN }}@github.com/$DOCS_REPO
             git push origin $DOCS_BRANCH
-            echo "${{ secrets.PAT }}" > token.txt
+            echo "${{ secrets.REPO_TOKEN }}" > token.txt
             gh auth login --with-token < token.txt
             gh pr create \
               --body "" \
