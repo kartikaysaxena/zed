@@ -6,7 +6,7 @@
         - "main"
   
   env:
-    DOCS_REPO: "authzed/docs"
+    DOCS_REPO: "kartikaysaxena/docs"
     DOCS_BRANCH: "main"
     GENERATED_DOCS_FILE: "docs/zed.md"
     TARGET_DOCS_FILE: "pages/zed/zed.md"
@@ -38,6 +38,9 @@
         - name: "Sync documentation changes"
           id: "sync"
           run: |
+            mkdir -p $(dirname $GENERATED_DOCS_FILE)
+            mkdir -p docs-repo/$(dirname $TARGET_DOCS_FILE)
+            touch docs-repo/$TARGET_DOCS_FILE
             rsync -avz --delete $GENERATED_DOCS_FILE/ docs-repo/$TARGET_DOCS_FILE
             cd docs-repo
             if ! git diff --exit-code; then
