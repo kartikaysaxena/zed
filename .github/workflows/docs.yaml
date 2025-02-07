@@ -43,12 +43,19 @@
             touch docs-repo/$TARGET_DOCS_FILE
             rsync -avz $GENERATED_DOCS_FILE docs-repo/$TARGET_DOCS_FILE
             cd docs-repo
-            if ! git diff --exit-code; then
+            git add $TARGET_DOCS_FILE
+            if ! git diff --cached --exit-code; then
+              echo "Changes detected in $TARGET_DOCS_FILE."
               echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
             else
+              echo "No changes detected in $TARGET_DOCS_FILE."
               echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
             fi
-  
+
+        - name: "Debug CHANGES_DETECTED"
+          run: |
+            echo "CHANGES_DETECTED: $CHANGES_DETECTED"
+
         - name: "Configure Git"
           if: |
             env.CHANGES_DETECTED == 'true'
