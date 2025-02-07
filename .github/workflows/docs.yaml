@@ -38,6 +38,8 @@ jobs:
       - name: "Sync documentation changes"
         id: "sync"
         run: |
+          mkdir -p $(dirname $GENERATED_DOCS_FILE)
+          mkdir -p docs-repo/$(dirname $TARGET_DOCS_FILE)
           touch docs-repo/$TARGET_DOCS_FILE
           rsync -avz $GENERATED_DOCS_FILE docs-repo/$TARGET_DOCS_FILE
           cd docs-repo
@@ -49,7 +51,6 @@ jobs:
             echo "No changes detected in $TARGET_DOCS_FILE."
             echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
           fi
-
       - name: "Configure Git"
         if: |
           env.CHANGES_DETECTED == 'true'
