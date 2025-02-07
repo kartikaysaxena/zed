@@ -78,7 +78,7 @@ jobs:
           env.CHANGES_DETECTED == 'true'
         uses: "peter-evans/create-pull-request@v5"
         with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
+          token: "${{ secrets.PAT }}"
           commit-message: "Update generated docs"
           branch: "update-generated-docs"
           title: "Sync generated docs"
