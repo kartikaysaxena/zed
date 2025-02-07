@@ -52,16 +52,11 @@ jobs:
           if ! git diff --cached --exit-code; then
             echo "Changes detected in $TARGET_DOCS_FILE."
             echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
+            git checkout -b 'update-generated-docs'
             git commit -m "Update generated docs"
+            git push origin $DOCS_BRANCH
+
           else
             echo "No changes detected in $TARGET_DOCS_FILE."
             echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
           fi
-
-      - name: "Create pull request"
-        if: |
-          env.CHANGES_DETECTED == 'true'
-        uses: "peter-evans/create-pull-request@v5"
-        with:
-          token: "${{ secrets.PAT }}"
-          branch: "update-generated-docs"
