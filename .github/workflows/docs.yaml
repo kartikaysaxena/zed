@@ -39,6 +39,7 @@ jobs:
           cd docs-repo
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+          git remote add origin https://${{ secrets.PAT }}@github.com/$DOCS_REPO
 
       - name: "Sync documentation changes"
         id: "sync"
