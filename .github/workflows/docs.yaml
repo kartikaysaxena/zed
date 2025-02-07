@@ -30,7 +30,7 @@ jobs:
 
       - name: "Clone docs repository"
         run: |
-          git clone --depth 1 --branch $DOCS_BRANCH https://github.com/$DOCS_REPO.git docs-repo || {
+          git clone --depth 1 --branch $DOCS_BRANCH https://${{ secrets.PAT }}@github.com/$DOCS_REPO.git docs-repo || {
             echo "Failed to clone docs repository"
             exit 1
           }
@@ -39,7 +39,6 @@ jobs:
           cd docs-repo
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git remote add origin https://${{ secrets.PAT }}@github.com/$DOCS_REPO
 
       - name: "Sync documentation changes"
         id: "sync"
