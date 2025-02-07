@@ -6,7 +6,7 @@ on:  # yamllint disable-line rule:truthy
       - "main"
 
 env:
-  DOCS_REPO: "authzed/docs"
+  DOCS_REPO: "kartikaysaxena/docs"
   DOCS_BRANCH: "main"
   GENERATED_DOCS_DIR: "docs"
   TARGET_DOCS_DIR: "pages/zed"
@@ -47,7 +47,8 @@ jobs:
       - name: "Compare generated docs with target docs"
         id: "compare"
         run: |
-          rsync -r --delete $GENERATED_DOCS_DIR/ docs-repo/$TARGET_DOCS_DIR
+          mkdir -p $(dirname docs-repo/$TARGET_DOCS_FILE)
+          rsync -av --delete $GENERATED_DOCS_FILE docs-repo/$TARGET_DOCS_FILE
           cd docs-repo
           if git diff --exit-code; then
             echo "No changes detected in docs."
