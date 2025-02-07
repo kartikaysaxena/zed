@@ -60,15 +60,16 @@ jobs:
             echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
             git checkout -b 'update-generated-docs'
             git commit -m "Update generated docs"
+            git push origin $DOCS_BRANCH
+            echo "${{ secrets.PAT }}" > token.txt
+            gh auth login --with-token < token.txt
+            gh pr create \
+              --body "" \
+              --title "docs: update zed docs" \
+              --head "$DOCS_BRANCH" \
+              --base "main"
           else
             echo "No changes detected in $TARGET_DOCS_FILE."
             echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
           fi
-      - name: "Push changes"
-        uses: "ad-m/github-push-action@master"
-        with:
-          github_token: "${{ secrets.PAT_TOKEN }}"
-          repository: "${{ env.DOCS_REPO }}"
-          branch: "${{ env.DOCS_BRANCH }}"
-          force: true
   
