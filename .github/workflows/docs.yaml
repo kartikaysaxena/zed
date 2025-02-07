@@ -23,46 +23,39 @@ jobs:
     name: "Generate & Sync Documentation"
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "actions/checkout@v4"
-        with:
-          token: ${{ secrets.REPO_TOKEN }}
-          repository: ${{ env.DOCS_REPO }}
+      - uses: "actions/checkout@v4"  # Checkout source repo
+      
       - uses: "authzed/actions/setup-go@main"
       - uses: "authzed/actions/setup-mage@main"
 
       - name: "Generate Documentation"
         run: "mage gen:docs"
 
-      - name: "Clone docs repository"
+      - name: "Checkout docs repository"
+        uses: "actions/checkout@v4"
+        with:
+          token: ${{ secrets.PAT }}
+          repository: kartikaysaxena/docs
+          path: docs-repo
+          ref: main
+
+      - name: "Sync documentation changes"
         run: |
-          git clone --depth 1 --branch $DOCS_BRANCH https://${{ secrets.REPO_TOKEN }}@github.com/$DOCS_REPO.git docs-repo || {
-            echo "Failed to clone docs repository"
-            exit 1
-          }
-      - name: "Configure Git"
-        run: |
+          # Copy from source repo's generated docs to docs repo
+          mkdir -p docs-repo/$(dirname $TARGET_DOCS_FILE)
+          cp -v $GENERATED_DOCS_FILE docs-repo/$TARGET_DOCS_FILE
+
+          # Commit changes if different
           cd docs-repo
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-
-      - name: "Sync documentation changes"
-        id: "sync"
-        run: |
-          mkdir -p $(dirname $GENERATED_DOCS_FILE)
-          mkdir -p docs-repo/$(dirname $TARGET_DOCS_FILE)
-          touch docs-repo/$TARGET_DOCS_FILE
-          rsync -avz $GENERATED_DOCS_FILE docs-repo/$TARGET_DOCS_FILE
-          cd docs-repo
+          
           git add $TARGET_DOCS_FILE
           if ! git diff --cached --exit-code; then
-            echo "Changes detected in $TARGET_DOCS_FILE."
-            echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
-            git checkout -b 'update-generated-docs'
             git commit -m "Update generated docs"
-            git remote set-url origin https://x-access-token:${{ secrets.REPO_TOKEN }}@github.com/$DOCS_REPO
-            git push origin update-generated-docs
+            echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
           else
-            echo "No changes detected in $TARGET_DOCS_FILE."
+            echo "No changes detected"
             echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
           fi
       - name: "Create pull request"
