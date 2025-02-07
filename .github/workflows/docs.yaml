@@ -30,7 +30,7 @@ jobs:
 
       - name: "Clone docs repository"
         run: |
-          git clone --depth 1 --branch $DOCS_BRANCH https://${{ secrets.PAT }}@github.com/$DOCS_REPO.git docs-repo || {
+          git clone --depth 1 --branch $DOCS_BRANCH https://${{ secrets.PAT_TOKEN }}@github.com/$DOCS_REPO.git docs-repo || {
             echo "Failed to clone docs repository"
             exit 1
           }
