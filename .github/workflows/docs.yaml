@@ -15,6 +15,12 @@ env:
 permissions:
   contents: "write"
   pull-requests: "write"
+  id-token: write
+  actions: "write"
+  packages: "write"
+  repository-projects: "write"
+  security-events: "write"
+  statuses: "write"
 
 jobs:
   sync-docs:
@@ -61,7 +67,7 @@ jobs:
       - name: "Push changes"
         uses: "ad-m/github-push-action@master"
         with:
-          github_token: "${{ secrets.GITHUB_TOKEN }}"
+          github_token: "${{ secrets.PAT_TOKEN }}"
           repository: "${{ env.DOCS_REPO }}"
           branch: "${{ env.DOCS_BRANCH }}"
           force: true
