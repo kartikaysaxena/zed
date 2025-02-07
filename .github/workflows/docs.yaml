@@ -61,13 +61,13 @@ jobs:
             git checkout -b 'update-generated-docs'
             git commit -m "Update generated docs"
             git remote set-url origin https://x-access-token:${{ secrets.REPO_TOKEN }}@github.com/$DOCS_REPO
-            git push origin $DOCS_BRANCH
+            git push origin update-generated-docs
             echo "${{ secrets.REPO_TOKEN }}" > token.txt
             gh auth login --with-token < token.txt
             gh pr create \
               --body "" \
               --title "docs: update zed docs" \
-              --head "$DOCS_BRANCH" \
+              --head "update-generated-docs" \
               --base "main"
           else
             echo "No changes detected in $TARGET_DOCS_FILE."
