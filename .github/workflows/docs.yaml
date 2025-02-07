@@ -31,8 +31,7 @@ jobs:
 
       - name: "Generate documentation"
         run: |
-          cd magefiles
-          if ! go run magefile.go gen:docs; then
+          if ! go run mage.go gen:docs; then
             echo "Documentation generation failed"
             exit 1
           fi
