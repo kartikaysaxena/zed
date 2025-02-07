@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: "actions/checkout@v4"
         with:
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.REPO_TOKEN }}
           repository: ${{ env.DOCS_REPO }}
       - uses: "authzed/actions/setup-go@main"
       - uses: "authzed/actions/setup-mage@main"
@@ -35,7 +35,7 @@ jobs:
 
       - name: "Clone docs repository"
         run: |
-          git clone --depth 1 --branch $DOCS_BRANCH https://${{ secrets.GITHUB_TOKEN }}@github.com/$DOCS_REPO.git docs-repo || {
+          git clone --depth 1 --branch $DOCS_BRANCH https://${{ secrets.REPO_TOKEN }}@github.com/$DOCS_REPO.git docs-repo || {
             echo "Failed to clone docs repository"
             exit 1
           }
