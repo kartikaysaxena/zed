@@ -6,7 +6,7 @@ on:  # yamllint disable-line rule:truthy
       - "main"
 
 env:
-  DOCS_REPO: "authzed/docs"
+  DOCS_REPO: "kartikaysaxena/docs"
   DOCS_BRANCH: "main"
   GENERATED_DOCS_FILE: "docs/zed.md"
   TARGET_DOCS_FILE: "pages/zed/zed.md"
@@ -26,7 +26,7 @@ jobs:
       - uses: "actions/checkout@v4"
         with:
           token: ${{ secrets.REPO_TOKEN }}
-          repository: $DOCS_REPO
+          repository: ${{ env.DOCS_REPO }}
       - uses: "authzed/actions/setup-go@main"
       - uses: "authzed/actions/setup-mage@main"
 
