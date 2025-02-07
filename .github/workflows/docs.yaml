@@ -35,8 +35,6 @@ jobs:
             exit 1
           }
       - name: "Configure Git"
-        if: |
-          env.CHANGES_DETECTED == 'true'
         run: |
           cd docs-repo
           git config user.name "GitHub Actions"
