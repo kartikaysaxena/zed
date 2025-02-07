@@ -34,6 +34,13 @@ jobs:
             echo "Failed to clone docs repository"
             exit 1
           }
+      - name: "Configure Git"
+        if: |
+          env.CHANGES_DETECTED == 'true'
+        run: |
+          cd docs-repo
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
 
       - name: "Sync documentation changes"
         id: "sync"
@@ -43,28 +50,15 @@ jobs:
           touch docs-repo/$TARGET_DOCS_FILE
           rsync -avz $GENERATED_DOCS_FILE docs-repo/$TARGET_DOCS_FILE
           cd docs-repo
+          git add $TARGET_DOCS_FILE
           if ! git diff --cached --exit-code; then
             echo "Changes detected in $TARGET_DOCS_FILE."
             echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
+            git commit -m "Update generated docs"
           else
             echo "No changes detected in $TARGET_DOCS_FILE."
             echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
           fi
-      - name: "Configure Git"
-        if: |
-          env.CHANGES_DETECTED == 'true'
-        run: |
-          cd docs-repo
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-
-      - name: "Commit and push changes"
-        if: |
-          env.CHANGES_DETECTED == 'true'
-        run: |
-          cd docs-repo
-          git add $TARGET_DOCS_FILE
-          git commit -m "Update generated docs"
 
       - name: "Create pull request"
         if: |
