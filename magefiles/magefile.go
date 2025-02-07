@@ -21,9 +21,9 @@ func (g Gen) All() error {
 
 // Generate markdown files for zed
 func (Gen) Docs() error {
-	targetDir := "../docs"
+	targetDir := "docs"
 
-	err := os.MkdirAll("../docs", os.ModePerm)
+	err := os.MkdirAll("docs", os.ModePerm)
 	if err != nil {
 		return err
 	}
