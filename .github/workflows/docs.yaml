@@ -41,7 +41,7 @@
             mkdir -p $(dirname $GENERATED_DOCS_FILE)
             mkdir -p docs-repo/$(dirname $TARGET_DOCS_FILE)
             touch docs-repo/$TARGET_DOCS_FILE
-            rsync -avz --delete $GENERATED_DOCS_FILE/ docs-repo/$TARGET_DOCS_FILE
+            rsync -avz $GENERATED_DOCS_FILE docs-repo/$TARGET_DOCS_FILE
             cd docs-repo
             if ! git diff --exit-code; then
               echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
